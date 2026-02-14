@@ -17,7 +17,6 @@ interface SidebarProps {
 }
 console.log(Lock)
 
-// Minimal type definition for html2pdf options
 interface Html2PdfOptions {
   margin?: number;
   filename?: string;
@@ -46,6 +45,36 @@ const items = [
   { name: "Experience", path: "/dashboard/experience", icon: Briefcase },
 ];
 
+// ✅ Proper type guard to fix TypeScript errors
+const fixColors = (root: HTMLElement) => {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+  let node: Node | null = walker.nextNode();
+
+  while (node) {
+    if (node && node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as HTMLElement;
+      const styles = window.getComputedStyle(el);
+
+      (["color", "backgroundColor", "borderColor"] as const).forEach((prop) => {
+        const val = styles[prop];
+        if (val && val.includes("oklch")) {
+          try {
+            const temp = document.createElement("div");
+            temp.style.color = val;
+            document.body.appendChild(temp);
+            const rgb = getComputedStyle(temp).color;
+            el.style.setProperty(prop, rgb);
+            temp.remove();
+          } catch {
+            el.style.setProperty(prop, "#111827"); // fallback
+          }
+        }
+      });
+    }
+    node = walker.nextNode();
+  }
+};
+
 export default function Sidebar({ setActiveTab }: SidebarProps) {
   const navigate = useNavigate();
   const { state } = useResume();
@@ -56,38 +85,9 @@ export default function Sidebar({ setActiveTab }: SidebarProps) {
     const element = document.getElementById("resume-preview");
     if (!element) return alert("Resume preview not found!");
 
-    // 🔹 Convert any oklch() colors to rgb() dynamically
-    const fixOkLCHColors = (root: HTMLElement) => {
-      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
-      let node: Node | null = walker.nextNode();
-
-      while (node) {
-        if (node instanceof HTMLElement) {
-          const styles = window.getComputedStyle(node);
-
-          ["color", "backgroundColor", "borderColor"].forEach((prop) => {
-            const val = (styles as any)[prop] as string;
-            if (val.includes("oklch")) {
-              try {
-                const temp = document.createElement("div");
-                temp.style.color = val;
-                document.body.appendChild(temp);
-                const rgb = getComputedStyle(temp).color;
-                node.style.setProperty(prop, rgb);
-                temp.remove();
-              } catch {
-                node.style.setProperty(prop, "#111827"); // fallback
-              }
-            }
-          });
-        }
-        node = walker.nextNode();
-      }
-    };
+    fixColors(element);
 
     try {
-      fixOkLCHColors(element); // preprocess colors
-
       const opt: Html2PdfOptions = {
         margin: 0,
         filename: `${state.name || "resume"}.pdf`,
@@ -104,7 +104,6 @@ export default function Sidebar({ setActiveTab }: SidebarProps) {
 
       await html2pdf().set(opt).from(element).save();
 
-      // Save resume to localStorage
       const key = `savedResumes_${user}`;
       const existing = JSON.parse(localStorage.getItem(key) || "[]");
       const newResume = {
