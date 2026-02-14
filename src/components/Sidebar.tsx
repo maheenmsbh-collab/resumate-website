@@ -56,7 +56,38 @@ export default function Sidebar({ setActiveTab }: SidebarProps) {
     const element = document.getElementById("resume-preview");
     if (!element) return alert("Resume preview not found!");
 
+    // 🔹 Convert any oklch() colors to rgb() dynamically
+    const fixOkLCHColors = (root: HTMLElement) => {
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null);
+      let node: Node | null = walker.nextNode();
+
+      while (node) {
+        if (node instanceof HTMLElement) {
+          const styles = window.getComputedStyle(node);
+
+          ["color", "backgroundColor", "borderColor"].forEach((prop) => {
+            const val = (styles as any)[prop] as string;
+            if (val.includes("oklch")) {
+              try {
+                const temp = document.createElement("div");
+                temp.style.color = val;
+                document.body.appendChild(temp);
+                const rgb = getComputedStyle(temp).color;
+                node.style.setProperty(prop, rgb);
+                temp.remove();
+              } catch {
+                node.style.setProperty(prop, "#111827"); // fallback
+              }
+            }
+          });
+        }
+        node = walker.nextNode();
+      }
+    };
+
     try {
+      fixOkLCHColors(element); // preprocess colors
+
       const opt: Html2PdfOptions = {
         margin: 0,
         filename: `${state.name || "resume"}.pdf`,
