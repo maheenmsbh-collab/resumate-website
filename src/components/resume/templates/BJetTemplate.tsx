@@ -20,13 +20,13 @@ export default function BJetTemplateDark({ data }: { data: ResumeState }) {
         <aside className="bg-yellow-50 p-6 sm:p-8 flex flex-col gap-6 sm:gap-10 rounded-bl-3xl rounded-tl-3xl shadow-inner md:col-span-1">
 
           
-          {(data.email || data.phone || data.github || data.linkedin || data.website || data.location) && (
+          {(data.email || data.phone || data.github || data.linkedin || data.website ) && (
             <section>
               <h2 className="text-xs font-semibold tracking-widest text-gray-500 mb-2 sm:mb-3">CONTACT</h2>
               <div className="space-y-1 sm:space-y-2 text-sm text-gray-700 break-words">
                 {data.phone && <p>Phone: {data.phone}</p>}
                 {data.email && <p>Email: {data.email}</p>}
-                {data.location && <p>Location: {data.location}</p>}
+                {/* {data.location && <p>Location: {data.location}</p>} */}
                 {data.github && <p>GitHub: {data.github}</p>}
                 {data.linkedin && <p>LinkedIn: {data.linkedin}</p>}
                 {data.website && <p>Website: {data.website}</p>}

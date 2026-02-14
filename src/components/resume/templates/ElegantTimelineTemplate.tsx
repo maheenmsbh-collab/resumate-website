@@ -1,4 +1,10 @@
-import type { ResumeState } from "../../../context/ResumeContext";
+import type {
+  ResumeState,
+  Experience,
+  Project,
+  Education
+} from "../../../context/ResumeContext";
+
 
 export default function ElegantTimelineTemplate({ data }: { data: ResumeState }) {
   const accent = data.headerColor || "#6366f1"; // purple accent
@@ -91,7 +97,8 @@ function TimelineSection({
   accent,
 }: {
   title: string;
-  items: any[];
+items: (Experience | Project | Education)[];
+
   accent: string;
 }) {
   if (!items || items.length === 0) return null;
@@ -103,9 +110,21 @@ function TimelineSection({
         {items.map((item) => (
           <TimelineRow
             key={item.id}
-            title={item.role || item.title || `${item.degree} — ${item.institution}`}
-            period={item.duration}
-            description={item.description || ""}
+            // title={item.role || item.title || `${item.degree} — ${item.institution}`}
+            title={
+  "role" in item
+    ? `${item.role} — ${item.company}`
+    : "title" in item
+    ? item.title
+    : `${item.degree} — ${item.institution}`
+}
+
+            // period={item.duration}
+            period={"duration" in item ? item.duration : undefined}
+
+            // description={item.description || ""}
+            description={"description" in item ? item.description : undefined}
+
             accent={accent}
           />
         ))}

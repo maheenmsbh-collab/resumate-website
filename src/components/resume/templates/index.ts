@@ -13,4 +13,5 @@ export const resumeTemplates = {
   creative: CreativeTemplate,
   elegantTimeline: ElegantTimelineTemplate,
   bjet: BJetTemplate,
+  
 };

@@ -69,7 +69,7 @@
 // };
 
 // export const useAuth = () => useContext(AuthContext);
-import React, { createContext, useState, useContext, useEffect, type ReactNode } from "react";
+import  { createContext, useState, useContext, useEffect, type ReactNode } from "react";
 import { useResume } from "./ResumeContext";
 
 interface AuthContextType {

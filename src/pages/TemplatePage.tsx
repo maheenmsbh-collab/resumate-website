@@ -4,7 +4,8 @@ import { resumeTemplates } from "../components/resume/templates";
 export default function TemplatesPage() {
   const { state, dispatch } = useResume();
 
-  const handleSelect = (templateKey: string) => {
+  // Fix: templateKey must be a valid key of resumeTemplates
+  const handleSelect = (templateKey: keyof typeof resumeTemplates) => {
     dispatch({ type: "SET_TEMPLATE", payload: templateKey });
   };
 
@@ -14,26 +15,28 @@ export default function TemplatesPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {Object.keys(resumeTemplates).map((key) => {
-          const TemplateComp = resumeTemplates[key];
-          const isSelected = state.template === key;
+          // TS fix: assert key as keyof typeof resumeTemplates
+          const templateKey = key as keyof typeof resumeTemplates;
+          const TemplateComp = resumeTemplates[templateKey];
+          const isSelected = state.template === templateKey;
+          console.log(TemplateComp)
 
           return (
             <div
-              key={key}
-              onClick={() => handleSelect(key)}
+              key={templateKey}
+              onClick={() => handleSelect(templateKey)}
               className={`border rounded-xl cursor-pointer overflow-hidden shadow-sm transition transform hover:scale-105 ${
                 isSelected ? "border-purple-600" : "border-gray-300"
               }`}
             >
               <div className="bg-white h-40 flex items-center justify-center">
-                <span className="text-sm font-semibold text-gray-700">{key}</span>
+                <span className="text-sm font-semibold text-gray-700">{templateKey}</span>
               </div>
             </div>
           );
         })}
       </div>
 
-      {/* Full-width info text */}
       <p className="text-sm text-gray-400 font-light mt-2">
         Better to fill your resume first, then try templates for better selection.
       </p>

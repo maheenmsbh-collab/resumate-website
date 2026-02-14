@@ -172,7 +172,7 @@ import { useRef, useState } from "react";
 import { resumeTemplates } from "../../components/resume/templates"; // for type safety
 
 type Template = {
-  id: keyof typeof resumeTemplates; // ✅ template ID must match context keys
+  id: string; // ✅ template ID must match context keys
   name: string;
   image: string;
   locked?: boolean;
@@ -207,13 +207,18 @@ export default function TemplateShowcasePage() {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleUseTemplate = (id: keyof typeof resumeTemplates) => {
-    // ✅ Set template safely
-    dispatch({ type: "SET_TEMPLATE", payload: id });
+  // const handleUseTemplate = (id: keyof typeof resumeTemplates) => {
+  //   // ✅ Set template safely
+  //   dispatch({ type: "SET_TEMPLATE", payload: id });
 
-    // Navigate to dashboard and open form panel
-    navigate("/dashboard/build", { state: { openForm: true } });
-  };
+  //   // Navigate to dashboard and open form panel
+  //   navigate("/dashboard/build", { state: { openForm: true } });
+  // };
+  const handleUseTemplate = (id: keyof typeof resumeTemplates) => {
+  dispatch({ type: "SET_TEMPLATE", payload: id });
+  navigate("/dashboard/build", { state: { openForm: true } });
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-200 px-10 py-10">
@@ -326,7 +331,12 @@ function TemplateGrid({
 
             {!locked ? (
               <button
-                onClick={() => onUse?.(t.id)}
+              onClick={() => {
+  if (!t.locked) {
+    onUse?.(t.id as keyof typeof resumeTemplates);
+  }
+}}
+
                 className="mt-4 w-full bg-purple-600 text-white rounded-lg py-2 text-sm font-medium hover:bg-purple-700 transition"
               >
                 Use Template
